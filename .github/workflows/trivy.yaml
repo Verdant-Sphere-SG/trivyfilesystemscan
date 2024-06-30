@@ -3,14 +3,16 @@ on:
   push:
     branches:
       - main
-
-permissions:
-  contents: read
-
 jobs:
   build:
     name: Build
     runs-on: ubuntu-20.04
+    permissions:
+      # required for all workflows
+      security-events: write
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,9 +27,6 @@ jobs:
           severity: 'CRITICAL'
 
       - name: Upload Trivy scan results to GitHub Security Tab
-        uses: github/codeql-action/upload-sarif@v2
-        permissions:
-            contents: read
-            packages: read
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
